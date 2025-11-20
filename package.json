@@ -1,0 +1,76 @@
+{
+  "name": "ink-command-style",
+  "displayName": "Ink Command Style",
+  "description": "VSCode Ink 自定义命令高亮",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:ink"
+  ],
+  "main": "./out/extension.js",
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^16.18.126",
+    "@types/vscode": "^1.80.0",
+    "typescript": "^5.9.3"
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "ink",
+        "aliases": [
+          "Ink",
+          "ink"
+        ],
+        "extensions": [
+          ".ink",
+          ".ink2"
+        ],
+        "filenames": [],
+        "filenamePatterns": [],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "ink",
+        "scopeName": "source.ink",
+        "path": "./syntaxes/ink.tmLanguage.json"
+      }
+    ],
+    "themes": [
+      {
+        "label": "Ink Syntax Colors",
+        "uiTheme": "vs-dark",
+        "path": "./themes/ink-color-theme.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "ink-command-style.visualize",
+        "title": "Ink: 打开脚本可视化面板"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "resourceLangId == ink",
+          "command": "ink-command-style.visualize",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

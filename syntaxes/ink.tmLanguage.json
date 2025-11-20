@@ -1,0 +1,193 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Ink",
+  "scopeName": "source.ink",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#dialogue" },
+    { "include": "#custom-commands" },
+    { "include": "#knots" },
+    { "include": "#stitches" },
+    { "include": "#choices" },
+    { "include": "#gathers" },
+    { "include": "#divert" },
+    { "include": "#logic" },
+    { "include": "#variables" },
+    { "include": "#tags" },
+    { "include": "#strings" },
+    { "include": "#commands" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.ink",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.ink",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "dialogue": {
+      "patterns": [
+        {
+          "name": "meta.dialogue.ink",
+          "match": "^\\s*([\\w\\u4e00-\\u9fa5]+)(:)\\s*(.*)$",
+          "captures": {
+            "1": { "name": "entity.name.character.ink" },
+            "2": { "name": "punctuation.separator.colon.ink" },
+            "3": { "name": "string.unquoted.dialogue.ink" }
+          }
+        }
+      ]
+    },
+    "knots": {
+      "name": "entity.name.function.knot.ink",
+      "match": "^\\s*(===?)\\s*([\\w_]+)\\s*(===?)\\s*$",
+      "captures": {
+        "1": { "name": "keyword.operator.knot.ink" },
+        "2": { "name": "entity.name.function.knot.ink" },
+        "3": { "name": "keyword.operator.knot.ink" }
+      }
+    },
+    "stitches": {
+      "name": "entity.name.function.stitch.ink",
+      "match": "^\\s*(=)\\s*([\\w_]+)\\s*$",
+      "captures": {
+        "1": { "name": "keyword.operator.stitch.ink" },
+        "2": { "name": "entity.name.function.stitch.ink" }
+      }
+    },
+    "choices": {
+      "patterns": [
+        {
+          "name": "keyword.control.choice.ink",
+          "match": "^\\s*(\\*+|\\++)\\s*",
+          "captures": {
+            "1": { "name": "keyword.operator.choice.ink" }
+          }
+        }
+      ]
+    },
+    "gathers": {
+      "name": "keyword.control.gather.ink",
+      "match": "^\\s*(-+)\\s*",
+      "captures": {
+        "1": { "name": "keyword.operator.gather.ink" }
+      }
+    },
+    "divert": {
+      "patterns": [
+        {
+          "name": "keyword.control.divert.ink",
+          "match": "(->|<-)\\s*([\\w_.]+)?",
+          "captures": {
+            "1": { "name": "keyword.operator.divert.ink" },
+            "2": { "name": "entity.name.function.target.ink" }
+          }
+        },
+        {
+          "name": "keyword.control.end.ink",
+          "match": "->\\s*(END|DONE)"
+        }
+      ]
+    },
+    "logic": {
+      "patterns": [
+        {
+          "name": "meta.embedded.block.ink",
+          "begin": "\\{",
+          "end": "\\}",
+          "patterns": [
+            { "include": "#logic-content" }
+          ]
+        }
+      ]
+    },
+    "logic-content": {
+      "patterns": [
+        {
+          "name": "keyword.control.conditional.ink",
+          "match": "\\b(if|else|not|and|or|true|false)\\b"
+        },
+        {
+          "name": "keyword.operator.ink",
+          "match": "(==|!=|<=|>=|<|>|\\+|-|\\*|/|%|!)"
+        },
+        { "include": "#variables" },
+        { "include": "#strings" },
+        { "include": "#numbers" }
+      ]
+    },
+    "variables": {
+      "patterns": [
+        {
+          "name": "variable.other.constant.ink",
+          "match": "\\b(VAR|CONST|temp)\\b"
+        },
+        {
+          "name": "variable.other.ink",
+          "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.ink",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.ink",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "numbers": {
+      "name": "constant.numeric.ink",
+      "match": "\\b\\d+(\\.\\d+)?\\b"
+    },
+    "tags": {
+      "name": "entity.name.tag.ink",
+      "match": "#\\s*\\w+"
+    },
+    "commands": {
+      "patterns": [
+        {
+          "name": "support.function.command.ink",
+          "match": "\\b(TODO|INCLUDE|LIST)\\b"
+        }
+      ]
+    },
+    "custom-commands": {
+      "patterns": [
+        {
+          "name": "meta.custom-command.ink",
+          "match": "(@)([\\w\\u4e00-\\u9fa5]+)\\s+((([\\w\\u4e00-\\u9fa5]+)(=)([^\\s]+)\\s*)*)",
+          "captures": {
+            "1": { "name": "keyword.operator.at.ink" },
+            "2": { "name": "entity.name.function.custom-command.ink" },
+            "3": {
+              "patterns": [
+                {
+                  "match": "([\\w\\u4e00-\\u9fa5]+)(=)([^\\s]+)",
+                  "captures": {
+                    "1": { "name": "variable.parameter.ink" },
+                    "2": { "name": "keyword.operator.assignment.ink" },
+                    "3": { "name": "constant.value.ink" }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}
