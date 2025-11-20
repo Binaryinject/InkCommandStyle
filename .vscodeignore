@@ -3,7 +3,6 @@
 .gitignore
 .git/**
 *.vsix
-node_modules/**
 src/**
 tsconfig.json
 .eslintrc.json
