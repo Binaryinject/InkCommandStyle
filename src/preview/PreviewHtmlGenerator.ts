@@ -1,0 +1,122 @@
+/**
+ * MIT License
+ *
+ * Copyright (c) 2025 Martin Crawford
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+import * as vscode from "vscode";
+
+/**
+ * Helper class for generating HTML content for the preview webview.
+ */
+export class PreviewHtmlGenerator {
+  private readonly extensionUri: vscode.Uri;
+
+  constructor(extensionUri: vscode.Uri) {
+    this.extensionUri = extensionUri;
+  }
+  /**
+   * Generates the complete HTML content for the preview webview.
+   * @param webview - The webview instance to generate resource URIs for
+   * @returns The complete HTML content as a string
+   */
+  public generateHtml(webview: vscode.Webview): string {
+    const mediaPath = vscode.Uri.joinPath(this.extensionUri, 'media');
+    const cssUrl = webview.asWebviewUri(vscode.Uri.joinPath(mediaPath, 'preview.css'));
+    const jsUrl = webview.asWebviewUri(vscode.Uri.joinPath(mediaPath, 'preview.js'));
+    const errorIconUrl = webview.asWebviewUri(vscode.Uri.joinPath(mediaPath, 'error-icon.svg'));
+    const warningIconUrl = webview.asWebviewUri(vscode.Uri.joinPath(mediaPath, 'warning-icon.svg'));
+    const infoIconUrl = webview.asWebviewUri(vscode.Uri.joinPath(mediaPath, 'info-icon.svg'));
+    const restartIconUrl = webview.asWebviewUri(vscode.Uri.joinPath(mediaPath, 'restart-icon.svg'));
+    const rewindIconUrl = webview.asWebviewUri(vscode.Uri.joinPath(mediaPath, 'rewind-icon.svg'));
+
+    return `<!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Ink Story Preview</title>
+        <link rel="stylesheet" href="${cssUrl}">
+      </head>
+      <body>
+        <div id="toolbar-container">
+          <div class="toolbar-buttons">
+            <button id="button-restart" class="btn btn-toolbar" title="Restart story">
+              <span class="restart-icon icon"></span>
+              Restart
+            </button>
+            <button id="button-rewind" class="btn btn-toolbar" title="Rewind to last choice">
+              <span class="rewind-icon icon"></span>
+              Rewind
+            </button>
+            <div class="live-update-control">
+              <label class="checkbox-container">
+                <input type="checkbox" id="live-update-checkbox" checked>
+                <span class="checkmark"></span>
+                <span class="checkbox-label">Live update</span>
+              </label>
+            </div>
+          </div>
+          <div id="error-indicators" class="error-indicators">
+            <button id="button-errors-error" class="btn btn-toolbar error-indicator" style="display: none;">
+              <span class="error-indicator-icon icon error-icon-error"></span>
+              <span id="error-count-error" class="error-count">0</span>
+            </button>
+            <button id="button-errors-warning" class="btn btn-toolbar error-indicator" style="display: none;">
+              <span class="error-indicator-icon icon error-icon-warning"></span>
+              <span id="error-count-warning" class="error-count">0</span>
+            </button>
+            <button id="button-errors-info" class="btn btn-toolbar error-indicator" style="display: none;">
+              <span class="error-indicator-icon icon error-icon-info"></span>
+              <span id="error-count-info" class="error-count">0</span>
+            </button>
+          </div>
+        </div>
+        <div id="story-container">
+          <div id="story-content"></div>
+          <div id="choices-container"></div>
+          <div id="error-modal" class="error-modal hidden">
+            <div class="error-modal-overlay"></div>
+            <div class="error-modal-content">
+              <div class="error-modal-header">
+                <h3>Issues</h3>
+                <button id="close-error-modal" class="btn btn-list close-button">×</button>
+              </div>
+              <div id="error-list" class="error-list">
+                <!-- Errors populated dynamically -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <script>
+          window.svgIcons = {
+            error: "${errorIconUrl}",
+            warning: "${warningIconUrl}",
+            info: "${infoIconUrl}",
+            restart: "${restartIconUrl}",
+            rewind: "${rewindIconUrl}"
+          };
+        </script>
+        <script src="${jsUrl}"></script>
+      </body>
+      </html>`;
+  }
+}

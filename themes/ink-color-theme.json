@@ -165,6 +165,13 @@
       "settings": {
         "foreground": "#d16969"
       }
+    },
+    {
+      "scope": "entity.name.tag.ink",
+      "settings": {
+        "foreground": "#4fc1ff",
+        "fontStyle": "bold"
+      }
     }
   ]
 }

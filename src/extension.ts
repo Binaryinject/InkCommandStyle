@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { InkVisualizerPanel } from './inkVisualizer';
+import { PreviewManager } from './preview/PreviewManager';
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Ink Command Style extension is now active');
@@ -24,6 +25,20 @@ export function activate(context: vscode.ExtensionContext) {
         }
     );
 
+    // 注册故事预览命令
+    const previewCommand = vscode.commands.registerCommand(
+        'ink-command-style.preview',
+        async () => {
+            const editor = vscode.window.activeTextEditor;
+            if (editor && editor.document.languageId === 'ink') {
+                const manager = PreviewManager.getInstance();
+                await manager.preview(editor.document);
+            } else {
+                vscode.window.showErrorMessage('请先打开一个 Ink 文件');
+            }
+        }
+    );
+
     // 监听文档变化，自动更新可视化面板
     const textEditorChange = vscode.window.onDidChangeActiveTextEditor(editor => {
         if (editor && editor.document.languageId === 'ink') {
@@ -38,7 +53,21 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    context.subscriptions.push(definitionProvider, documentSymbolProvider, visualizeCommand, textEditorChange, documentChange);
+    // 监听文档保存，自动更新预览面板（Live Update）
+    const documentSave = vscode.workspace.onDidSaveTextDocument(async (document) => {
+        if (document.languageId === 'ink') {
+            const manager = PreviewManager.getInstance();
+            if (manager && manager.isActive()) {
+                const liveUpdateEnabled = manager.isLiveUpdateEnabled();
+                if (liveUpdateEnabled) {
+                    console.log('[Extension] Live update triggered for:', document.uri.fsPath);
+                    await manager.preview(document);
+                }
+            }
+        }
+    });
+
+    context.subscriptions.push(definitionProvider, documentSymbolProvider, visualizeCommand, previewCommand, textEditorChange, documentChange, documentSave);
 }
 
 export function deactivate() {}

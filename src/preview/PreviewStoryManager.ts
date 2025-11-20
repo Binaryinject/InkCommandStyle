@@ -1,0 +1,291 @@
+/**
+ * MIT License
+ *
+ * Copyright (c) 2025 Martin Crawford
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+import { Story } from "inkjs";
+import { StoryProgressResult } from "./StoryProgressResult";
+import { StoryEvent, TextStoryEvent, Choice, ErrorInfo } from "./PreviewState";
+import { parseErrorMessage } from "./parseErrorMessage";
+
+/**
+ * Result of a single story continuation attempt.
+ */
+export interface ContinueResult {
+  shouldContinue: boolean;
+  error?: ErrorInfo;
+}
+
+/**
+ * Callback for handling errors from the Ink Story.
+ * @param error - The error to handle
+ */
+export type ErrorCallback = (error: ErrorInfo) => void;
+
+/**
+ * Manages story progression operations and encapsulates all direct interaction with the Ink Story engine.
+ * This class provides a high-level interface for story operations while keeping the complex
+ * story continuation logic centralized and reusable.
+ */
+export class PreviewStoryManager {
+  // Private Properties ===============================================================================================
+
+  private readonly story: Story;
+
+  // Constructor ======================================================================================================
+
+  /**
+   * Creates a new PreviewStoryManager wrapping the provided Ink story instance.
+   * @param story - The Ink story instance to manage
+   */
+  constructor(story: Story) {
+    this.story = story;
+  }
+
+  // Public Methods ===================================================================================================
+
+  /**
+   * Checks if the story can continue.
+   * @returns True if the story can continue with more content
+   */
+  canContinue(): boolean {
+    return this.story.canContinue;
+  }
+
+  /**
+   * Continues the story until it reaches a choice point or ends.
+   * Collects all events generated during continuation and returns the result.
+   * @returns StoryProgressResult containing events, choices, and end state
+   */
+  continue(): StoryProgressResult {
+    console.log('[PreviewStoryManager] Starting continue()');
+    console.log('[PreviewStoryManager] canContinue:', this.story.canContinue);
+    console.log('[PreviewStoryManager] isEnded:', this.isEnded());
+    
+    // Guard against continuing a finished story
+    if (this.isEnded()) {
+      console.log('[PreviewStoryManager] Story is ended, returning empty result');
+      return {
+        events: [],
+        choices: [],
+        isEnded: true,
+        errors: [],
+      };
+    }
+
+    const events: StoryEvent[] = [];
+    const errors: ErrorInfo[] = [];
+    let allTags: string[] = [];
+    let pendingCommands: string[] = []; // Accumulate custom commands
+
+    // Continue until we hit a choice point or the end
+    while (this.story.canContinue) {
+      const continueResult = this.doContinue(events, allTags, pendingCommands);
+
+      if (continueResult.error) {
+        errors.push(continueResult.error);
+      }
+
+      // If doContinue() indicates we should stop, break the loop
+      if (!continueResult.shouldContinue) {
+        break;
+      }
+    }
+
+    console.log('[PreviewStoryManager] Continue finished, events count:', events.length);
+    if (events.length > 0) {
+      console.log('[PreviewStoryManager] First event:', events[0]);
+    }
+    
+    // Get current choices
+    const choices = this.getCurrentChoices();
+    const isEnded = this.isEnded();
+    console.log('[PreviewStoryManager] Choices:', choices.length, 'isEnded:', isEnded);
+    
+    return {
+      events,
+      choices,
+      isEnded,
+      errors,
+    };
+  }
+
+  /**
+   * Gets the current available choices.
+   * @returns Array of current choices available to the player
+   */
+  getCurrentChoices(): Choice[] {
+    return this.story.currentChoices.map((choice: any, index: number) => ({
+      index,
+      text: choice.text,
+      tags: choice.tags || [],
+    }));
+  }
+
+  /**
+   * Checks if the story has reached an end state.
+   * @returns True if the story has ended (cannot continue and has no choices)
+   */
+  isEnded(): boolean {
+    return !this.story.canContinue && this.story.currentChoices.length === 0;
+  }
+
+  /**
+   * Registers an Error Callback for handling errors from the Ink Story.
+   * @param callback - The callback to register
+   */
+  onError(callback: ErrorCallback): void {
+    if (!this.story.onError) {
+      return;
+    }
+    this.story.onError = (error) => {
+      const { message, severity } = parseErrorMessage(error.toString());
+      callback({ message, severity: severity || "error" });
+    };
+  }
+
+  /**
+   * Resets the story to its initial state.
+   * This prepares the story for execution from the beginning.
+   */
+  reset(): void {
+    try {
+      this.story.ResetState();
+    } catch (error) {
+      console.error(
+        "[PreviewStoryManager] ❌ Failed to reset story state:",
+        error
+      );
+      // Note: We don't throw here to prevent breaking the action chain
+      // The story will remain in its previous state if reset fails
+    }
+  }
+
+  /**
+   * Selects a choice and then continues the story until the next choice point or end.
+   * Combines choice selection with story continuation in a single operation.
+   * @param choiceIndex - The index of the choice to select
+   * @returns StoryProgressResult containing events, choices, and end state after selection
+   */
+  selectChoice(choiceIndex: number): StoryProgressResult {
+    try {
+      // Select the choice
+      this.story.ChooseChoiceIndex(choiceIndex);
+
+      // Continue story after choice selection
+      return this.continue();
+    } catch (error) {
+      console.error("[PreviewStoryManager] ❌ Error selecting choice:", error);
+
+      // Return safe default state after error
+      const { message, severity } = parseErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Unknown error selecting choice"
+      );
+
+      return {
+        events: [],
+        choices: [],
+        isEnded: true,
+        errors: [
+          {
+            message,
+            severity: severity || "error",
+          },
+        ],
+      };
+    }
+  }
+
+  // Private Methods ==================================================================================================
+
+  /**
+   * Continues the story execution with error handling.
+   * Handles the complete continue block including text extraction, tag processing, and event creation.
+   * @param events - Array to add the text event to
+   * @param allTags - Array to accumulate tags to
+   * @param pendingCommands - Array to accumulate custom commands
+   * @returns ContinueResult indicating whether to continue and any errors that occurred
+   */
+  private doContinue(events: StoryEvent[], allTags: string[], pendingCommands: string[]): ContinueResult {
+    try {
+      const lineText = this.story.Continue();
+
+      // If no text was produced, return false to stop (normal case, not an error)
+      if (!lineText) {
+        return { shouldContinue: false };
+      }
+
+      // Filter out custom command lines starting with @
+      // Check if the line is a custom command (starts with @ after trimming)
+      const trimmedText = lineText.trim();
+      if (trimmedText.startsWith('@')) {
+        console.log('[PreviewStoryManager] Collecting custom command:', trimmedText);
+        // Collect this command and continue to the next line
+        pendingCommands.push(trimmedText);
+        return { shouldContinue: true };
+      }
+
+      // Get current tags after the continue call
+      const lineTags = this.story.currentTags || [];
+
+      // Create the text event with custom commands if any
+      const textEvent: TextStoryEvent = {
+        type: "text",
+        text: lineText,
+        tags: lineTags,
+        isCurrent: false, // Set to false here as it will be set properly by AddStoryEventsAction
+        customCommands: pendingCommands.length > 0 ? [...pendingCommands] : undefined,
+      };
+
+      // Add the event to the events array
+      events.push(textEvent);
+
+      // Clear pending commands after attaching to text event
+      pendingCommands.length = 0;
+
+      // Track all tags for potential future use
+      allTags.push(...lineTags);
+
+      return { shouldContinue: true }; // Continue processing
+    } catch (error) {
+      console.error(
+        "[PreviewStoryManager] ❌ Error during story continuation:",
+        error
+      );
+
+      // Parse and return the error
+      const { message, severity } = parseErrorMessage(
+        error instanceof Error ? error.message : "Unknown story execution error"
+      );
+
+      return {
+        shouldContinue: false,
+        error: {
+          message,
+          severity: severity || "error",
+        },
+      };
+    }
+  }
+}

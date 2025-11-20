@@ -1,59 +1,30 @@
-// Ink示例文件 - 用于测试语法高亮和跳转功能
+INCLUDE Bootstrap.ink
+
 === start ===
-这是故事的开始。
+欢迎来到测试故事！
+@setBackground image=forest.jpg
+你来到了一片神秘的森林。
+@playSound sound=birds.mp3 volume=0.5
+旁白: 这里的空气中弥漫着花香。
 
-VAR player_health = 100
-VAR has_key = false
+* [选择正确的路径] -> correct_path
+* [选择错误的路径] -> wrong_path
+* [测试Bootstrap] -> bootstrap_start
 
-你站在一座神秘的城堡前。
+= correct_path
+@showCharacter name=导游 position=left
+你选择了正确的路径。
+导游: 很好，跟我来！
+导游: 我会带你去一个安全的地方。
+玩家: 谢谢你的帮助。
+@hideCharacter name=导游
+旁白: 你跟着导游继续前进。
+-> END
 
-* [进入城堡] -> enter_castle
-* [绕着城堡走] -> walk_around
-+ [离开这里] -> END
-
-=== enter_castle ===
-你推开了厚重的大门。
-
-守卫: 站住！这里是禁区！ #angry
-主角: 我有重要的事情要做。 #determined
-守卫: 那你得先通过我这一关。 #threatening
-
-= hall
-大厅里很安静。
-
-{ has_key:
-    你手里的钥匙发出微光。
-- else:
-    也许这里有什么有用的东西。
-}
-
-* [检查房间] -> check_room
-* [上楼] -> upstairs
-- -> hall
-
-= check_room
-你在房间里找到了一把古老的钥匙！
-~ has_key = true
--> hall
-
-= upstairs
-你走上楼梯。
--> DONE
-
-=== walk_around ===
-你绕着城堡走了一圈，什么也没发现。
--> start
-
-// 这是注释
-/* 这是
-   多行注释 */
-
-# tag_example
-TODO: 添加更多内容
-
-// 自定义命令示例 - 测试高亮
-@命令 参数1=21 参数2=你好
-@播放音效 音效名称=爆炸 音量=100 循环=false
-@显示图片 图片路径=bg/castle.png 位置=center 淡入时间=1.5
-@设置变量 变量名=score 值=999
-@跳转场景 场景=boss_fight 难度=hard
+= wrong_path
+你选择了错误的路径。
+@playSound sound=error.mp3
+这里看起来很危险。
+神秘声音: 离开这里，否则后果自负！
+旁白: 你感到一阵寒意。
+-> END

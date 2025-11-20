@@ -64,6 +64,10 @@
       {
         "command": "ink-command-style.visualize",
         "title": "Ink: 打开脚本可视化面板"
+      },
+      {
+        "command": "ink-command-style.preview",
+        "title": "Ink: 打开故事预览"
       }
     ],
     "menus": {
@@ -71,6 +75,24 @@
         {
           "when": "resourceLangId == ink",
           "command": "ink-command-style.visualize",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceLangId == ink",
+          "command": "ink-command-style.preview",
+          "group": "navigation"
+        }
+      ],
+      "editor/title": [
+        {
+          "when": "resourceLangId == ink",
+          "command": "ink-command-style.visualize",
+          "group": "navigation",
+          "alt": "ink-command-style.preview"
+        },
+        {
+          "when": "resourceLangId == ink",
+          "command": "ink-command-style.preview",
           "group": "navigation"
         }
       ]
@@ -85,5 +107,9 @@
     "language support"
   ],
   "author": "BinaryInject",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "immer": "^10.2.0",
+    "inkjs": "^2.3.2"
+  }
 }
