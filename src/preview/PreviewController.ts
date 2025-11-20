@@ -269,7 +269,7 @@ export class PreviewController {
           return;
         }
         
-        // First, open editor with focus to show cursor
+        // Open editor with focus to show cursor
         const editor = await vscode.window.showTextDocument(document, {
           viewColumn: vscode.ViewColumn.One,
           preserveFocus: false, // Get focus to show cursor
@@ -279,11 +279,6 @@ export class PreviewController {
         // Set cursor at the start of the line
         editor.selection = new vscode.Selection(position, position);
         editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
-        
-        // After a short delay, return focus to webview
-        setTimeout(() => {
-          this.webviewPanel.reveal(vscode.ViewColumn.Beside, false);
-        }, 100);
       }
     });
   }
