@@ -35,11 +35,16 @@
       "patterns": [
         {
           "name": "meta.dialogue.ink",
-          "match": "^\\s*([\\w\\u4e00-\\u9fa5]+)(:)\\s*(.*)$",
+          "match": "^\\s*([\\w\\u4e00-\\u9fa5]+)(:)\\s*([^#]*)(#.*)?$",
           "captures": {
             "1": { "name": "entity.name.character.ink" },
             "2": { "name": "punctuation.separator.colon.ink" },
-            "3": { "name": "string.unquoted.dialogue.ink" }
+            "3": { "name": "string.unquoted.dialogue.ink" },
+            "4": { 
+              "patterns": [
+                { "include": "#tags" }
+              ]
+            }
           }
         }
       ]
