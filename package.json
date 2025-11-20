@@ -3,7 +3,7 @@
   "displayName": "Ink Command Style",
   "description": "功能强大的 Ink 语言插件：完整语法高亮、可视化调试、智能跳转",
   "version": "1.0.0",
-  "publisher": "your-publisher-name",
+  "publisher": "BinaryInject",
   "repository": {
     "type": "git",
     "url": "https://github.com/BinaryInject/InkCommandStyle"
