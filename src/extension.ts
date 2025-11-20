@@ -129,8 +129,8 @@ class InkDefinitionProvider implements vscode.DefinitionProvider {
                             break;
                         }
 
-                        // 匹配 = stitch_name
-                        const stitchMatch = stitchLine.match(/^[\s]*=\s+([\w_]+)\s*$/);
+                        // 匹配 = stitch_name (支持 = xxx 和 =xxx 两种格式)
+                        const stitchMatch = stitchLine.match(/^[\s]*=\s*([\w_]+)\s*$/);
                         if (stitchMatch && stitchMatch[1] === stitchName) {
                             const position = new vscode.Position(j, stitchLine.indexOf(stitchName));
                             return new vscode.Location(document.uri, position);
@@ -141,7 +141,7 @@ class InkDefinitionProvider implements vscode.DefinitionProvider {
 
             // 如果没有指定 knot，只查找 stitch（在当前 knot 中）
             if (!stitchName && parts.length === 1) {
-                const stitchMatch = line.match(/^[\s]*=\s+([\w_]+)\s*$/);
+                const stitchMatch = line.match(/^[\s]*=\s*([\w_]+)\s*$/);
                 if (stitchMatch && stitchMatch[1] === target) {
                     const position = new vscode.Position(i, line.indexOf(target));
                     return new vscode.Location(document.uri, position);
@@ -198,8 +198,8 @@ class InkDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
                 continue;
             }
 
-            // 匹配 Stitch
-            const stitchMatch = line.match(/^\s*=\s+([\w_]+)\s*$/);
+            // 匹配 Stitch (支持 = xxx 和 =xxx 两种格式)
+            const stitchMatch = line.match(/^\s*=\s*([\w_]+)\s*$/);
             if (stitchMatch && currentKnot) {
                 const stitchName = stitchMatch[1];
                 const nameIndex = line.indexOf(stitchName);
