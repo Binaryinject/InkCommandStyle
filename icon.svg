@@ -1,0 +1,35 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="128" height="128" rx="16" fill="#1e1e1e"/>
+  
+  <!-- 墨水瓶轮廓 -->
+  <g transform="translate(64, 64)">
+    <!-- 瓶盖 -->
+    <rect x="-18" y="-45" width="36" height="8" rx="2" fill="#569cd6"/>
+    
+    <!-- 瓶颈 -->
+    <path d="M -15 -37 L -20 -20 L 20 -20 L 15 -37 Z" fill="#4ec9b0"/>
+    
+    <!-- 瓶身 -->
+    <ellipse cx="0" cy="-10" rx="25" ry="8" fill="#ce9178" opacity="0.3"/>
+    <path d="M -20 -20 Q -28 0 -25 25 L 25 25 Q 28 0 20 -20 Z" fill="#ce9178"/>
+    
+    <!-- 墨水液面 -->
+    <ellipse cx="0" cy="10" rx="20" ry="6" fill="#1e1e1e" opacity="0.4"/>
+    <path d="M -20 10 Q -23 18 -20 25 L 20 25 Q 23 18 20 10 Z" fill="#569cd6" opacity="0.8"/>
+    
+    <!-- 高光 -->
+    <ellipse cx="-12" cy="-5" rx="8" ry="15" fill="white" opacity="0.15"/>
+    
+    <!-- 羽毛笔 -->
+    <g transform="rotate(-30) translate(15, -25)">
+      <path d="M 0 0 Q 2 -15 4 -25 Q 2 -20 0 -15 Q -2 -20 -4 -25 Q -2 -15 0 0 Z" 
+            fill="#dcdcaa" stroke="#c586c0" stroke-width="0.5"/>
+      <line x1="0" y1="0" x2="8" y2="8" stroke="#dcdcaa" stroke-width="1.5"/>
+    </g>
+  </g>
+  
+  <!-- 装饰文字 Ink -->
+  <text x="64" y="110" font-family="Arial, sans-serif" font-size="20" 
+        font-weight="bold" fill="#dcdcaa" text-anchor="middle">Ink</text>
+</svg>
