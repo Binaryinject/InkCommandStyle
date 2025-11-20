@@ -245,13 +245,6 @@ export class PreviewController {
       if (this.documentUri) {
         const document = await vscode.workspace.openTextDocument(this.documentUri);
         
-        // Open editor without stealing focus from webview
-        const editor = await vscode.window.showTextDocument(document, {
-          viewColumn: vscode.ViewColumn.One, // Open in first column (main editor area)
-          preserveFocus: true, // Don't steal focus from webview
-          preview: false // Open as non-preview tab
-        });
-        
         let position: vscode.Position;
         
         if (payload.line !== undefined) {
@@ -276,9 +269,21 @@ export class PreviewController {
           return;
         }
         
+        // First, open editor with focus to show cursor
+        const editor = await vscode.window.showTextDocument(document, {
+          viewColumn: vscode.ViewColumn.One,
+          preserveFocus: false, // Get focus to show cursor
+          preview: false
+        });
+        
         // Set cursor at the start of the line
         editor.selection = new vscode.Selection(position, position);
         editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
+        
+        // After a short delay, return focus to webview
+        setTimeout(() => {
+          this.webviewPanel.reveal(vscode.ViewColumn.Beside, false);
+        }, 100);
       }
     });
   }
