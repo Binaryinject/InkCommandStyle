@@ -4,3 +4,9 @@
 .git/**
 *.vsix
 node_modules/**
+src/**
+tsconfig.json
+.eslintrc.json
+**/*.ts
+**/*.map
+.editorconfig
