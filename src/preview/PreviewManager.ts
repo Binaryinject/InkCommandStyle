@@ -48,7 +48,7 @@ export class PreviewManager {
 
   // Public Static Methods ============================================================================================
 
-  public static getInstance(): PreviewManager {
+  public static getInstance(extensionUri: vscode.Uri): PreviewManager {
     const column = vscode.window.activeTextEditor
       ? vscode.ViewColumn.Beside
       : undefined;
@@ -60,18 +60,14 @@ export class PreviewManager {
     }
 
     // Otherwise, create a new panel
-    PreviewManager.instance = new PreviewManager();
+    PreviewManager.instance = new PreviewManager(extensionUri);
     return PreviewManager.instance;
   }
 
   // Constructor ======================================================================================================
 
-  private constructor() {
-    const extensionPath = vscode.extensions.getExtension('BinaryInject.ink-command-style')?.extensionUri;
-    if (!extensionPath) {
-      throw new Error('Extension path not found');
-    }
-    this.extensionUri = extensionPath;
+  private constructor(extensionUri: vscode.Uri) {
+    this.extensionUri = extensionUri;
 
     const mediaPath = vscode.Uri.joinPath(this.extensionUri, 'media');
 

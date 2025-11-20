@@ -1,5 +1,14 @@
 # 更新日志
 
+## [1.0.2] - 2025-01-20
+
+### 修复
+- 修复安装后命令 'ink-command-style.preview' not found 的错误
+- 修复 PreviewManager 的 extensionUri 初始化问题
+- 改进扩展激活时的资源路径解析
+
+---
+
 ## [1.0.1] - 2025-01-20
 
 ### 新增功能

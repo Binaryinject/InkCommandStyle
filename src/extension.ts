@@ -31,7 +31,7 @@ export function activate(context: vscode.ExtensionContext) {
         async () => {
             const editor = vscode.window.activeTextEditor;
             if (editor && editor.document.languageId === 'ink') {
-                const manager = PreviewManager.getInstance();
+                const manager = PreviewManager.getInstance(context.extensionUri);
                 await manager.preview(editor.document);
             } else {
                 vscode.window.showErrorMessage('请先打开一个 Ink 文件');
@@ -56,7 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
     // 监听文档保存，自动更新预览面板（Live Update）
     const documentSave = vscode.workspace.onDidSaveTextDocument(async (document) => {
         if (document.languageId === 'ink') {
-            const manager = PreviewManager.getInstance();
+            const manager = PreviewManager.getInstance(context.extensionUri);
             if (manager && manager.isActive()) {
                 const liveUpdateEnabled = manager.isLiveUpdateEnabled();
                 if (liveUpdateEnabled) {
