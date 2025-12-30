@@ -172,6 +172,19 @@
         "foreground": "#4fc1ff",
         "fontStyle": "bold"
       }
+    },
+    {
+      "scope": "variable.other.custom.ink",
+      "settings": {
+        "foreground": "#c586c0",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": "entity.name.variable.custom.ink",
+      "settings": {
+        "foreground": "#dcdcaa"
+      }
     }
   ]
 }

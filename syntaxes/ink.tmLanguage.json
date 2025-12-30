@@ -6,6 +6,7 @@
     { "include": "#comments" },
     { "include": "#dialogue" },
     { "include": "#custom-commands" },
+    { "include": "#custom-variables" },
     { "include": "#knots" },
     { "include": "#stitches" },
     { "include": "#choices" },
@@ -190,6 +191,18 @@
                 }
               ]
             }
+          }
+        }
+      ]
+    },
+    "custom-variables": {
+      "patterns": [
+        {
+          "name": "variable.other.custom.ink",
+          "match": "\\(([\\w\\u4e00-\\u9fa5_]+)\\)",
+          "captures": {
+            "0": { "name": "variable.other.custom.ink" },
+            "1": { "name": "entity.name.variable.custom.ink" }
           }
         }
       ]
