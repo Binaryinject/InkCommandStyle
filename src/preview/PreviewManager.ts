@@ -48,6 +48,13 @@ export class PreviewManager {
 
   // Public Static Methods ============================================================================================
 
+  /**
+   * Get the existing instance without creating a new one
+   */
+  public static getExistingInstance(): PreviewManager | undefined {
+    return PreviewManager.instance;
+  }
+
   public static getInstance(extensionUri: vscode.Uri): PreviewManager {
     const column = vscode.window.activeTextEditor
       ? vscode.ViewColumn.Beside

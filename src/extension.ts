@@ -56,7 +56,8 @@ export function activate(context: vscode.ExtensionContext) {
     // 监听文档保存，自动更新预览面板（Live Update）
     const documentSave = vscode.workspace.onDidSaveTextDocument(async (document) => {
         if (document.languageId === 'ink') {
-            const manager = PreviewManager.getInstance(context.extensionUri);
+            // 只在预览面板已存在时才更新，不自动创建新面板
+            const manager = PreviewManager.getExistingInstance();
             if (manager && manager.isActive()) {
                 const liveUpdateEnabled = manager.isLiveUpdateEnabled();
                 if (liveUpdateEnabled) {
