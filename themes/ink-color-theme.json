@@ -176,14 +176,14 @@
     {
       "scope": "variable.other.custom.ink",
       "settings": {
-        "foreground": "#c586c0",
+        "foreground": "#4ec9b0",
         "fontStyle": "bold"
       }
     },
     {
       "scope": "entity.name.variable.custom.ink",
       "settings": {
-        "foreground": "#dcdcaa"
+        "foreground": "#4ec9b0"
       }
     }
   ]
