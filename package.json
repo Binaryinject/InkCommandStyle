@@ -53,6 +53,13 @@
         "path": "./syntaxes/ink.tmLanguage.json"
       }
     ],
+    "themes": [
+      {
+        "label": "Ink Syntax Colors",
+        "uiTheme": "vs-dark",
+        "path": "./themes/ink-color-theme.json"
+      }
+    ],
     "commands": [
       {
         "command": "ink-command-style.visualize",
