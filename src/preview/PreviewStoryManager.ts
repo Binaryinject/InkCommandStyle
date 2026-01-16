@@ -59,9 +59,24 @@ export class PreviewStoryManager {
    */
   constructor(story: Story) {
     this.story = story;
+    this.initializePreviewVariables();
   }
 
   // Public Methods ===================================================================================================
+
+  /**
+   * Initializes preview mode flag for the story.
+   * Sets PREVIEW_MODE variable so Ink scripts can detect preview mode and adjust behavior.
+   */
+  private initializePreviewVariables(): void {
+    try {
+      // Set PREVIEW_MODE flag to true
+      this.story.variablesState.$('PREVIEW_MODE', true);
+      console.log('[PreviewStoryManager] Preview mode enabled: PREVIEW_MODE = true');
+    } catch (error) {
+      console.warn('[PreviewStoryManager] Failed to set PREVIEW_MODE variable:', error);
+    }
+  }
 
   /**
    * Checks if the story can continue.
@@ -96,9 +111,21 @@ export class PreviewStoryManager {
     const errors: ErrorInfo[] = [];
     let allTags: string[] = [];
     let pendingCommands: string[] = []; // Accumulate custom commands
+    let iterationCount = 0;
+    const MAX_ITERATIONS = 1000; // Prevent infinite loops
 
     // Continue until we hit a choice point or the end
     while (this.story.canContinue) {
+      iterationCount++;
+      if (iterationCount > MAX_ITERATIONS) {
+        console.error('[PreviewStoryManager] ❌ Maximum iteration limit reached, breaking loop to prevent infinite loop');
+        errors.push({
+          message: 'Story execution exceeded maximum iteration limit. This may indicate an infinite loop in your story.',
+          severity: 'error'
+        });
+        break;
+      }
+
       const continueResult = this.doContinue(events, allTags, pendingCommands);
 
       if (continueResult.error) {

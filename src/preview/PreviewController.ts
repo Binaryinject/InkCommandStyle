@@ -75,16 +75,20 @@ export class PreviewController {
   public async initializeStory(
     storyManager: PreviewStoryManager
   ): Promise<void> {
+    console.log('[PreviewController] 🎬 initializeStory called');
     this.stateManager.setStoryManager(storyManager);
     this.stateManager.reset();
 
     if (!this.isInitialized) {
+      console.log('[PreviewController] ⏳ Waiting for webview ready...');
       this.isInitialized = true;
       this.viewReadyDeferred = new Deferred<void>();
       await this.viewReadyDeferred.promise;
+      console.log('[PreviewController] ✅ Webview ready received');
     }
 
     // Start the story
+    console.log('[PreviewController] 🚀 Starting story...');
     this.stateManager.dispatch(new StartStoryAction());
   }
 
@@ -302,9 +306,10 @@ export class PreviewController {
    * Sets up the webview and initializes its content.
    */
   private setupWebview(): void {
-    console.debug("[PreviewController] 👀 Initializing preview webview");
+    console.log("[PreviewController] 👀 Setting up webview HTML");
     this.webviewPanel.webview.html = this.htmlGenerator.generateHtml(
       this.webviewPanel.webview
     );
+    console.log("[PreviewController] ✅ Webview HTML set");
   }
 }

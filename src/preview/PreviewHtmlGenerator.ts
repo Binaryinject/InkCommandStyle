@@ -33,6 +33,19 @@ export class PreviewHtmlGenerator {
   constructor(extensionUri: vscode.Uri) {
     this.extensionUri = extensionUri;
   }
+
+  /**
+   * Generates a random nonce for CSP.
+   */
+  private getNonce(): string {
+    let text = '';
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < 32; i++) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+  }
+
   /**
    * Generates the complete HTML content for the preview webview.
    * @param webview - The webview instance to generate resource URIs for
@@ -47,6 +60,8 @@ export class PreviewHtmlGenerator {
     const infoIconUrl = webview.asWebviewUri(vscode.Uri.joinPath(mediaPath, 'info-icon.svg'));
     const restartIconUrl = webview.asWebviewUri(vscode.Uri.joinPath(mediaPath, 'restart-icon.svg'));
     const rewindIconUrl = webview.asWebviewUri(vscode.Uri.joinPath(mediaPath, 'rewind-icon.svg'));
+
+    const nonce = this.getNonce();
 
     return `<!DOCTYPE html>
       <html lang="en">
